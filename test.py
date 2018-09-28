@@ -4,6 +4,7 @@ import numpy as np
 CHUNK_SIZE = 8192
 AUDIO_FORMAT = pyaudio.paInt16
 SAMPLE_RATE = 44100
+max = 0.
 
 def main():
     p = pyaudio.PyAudio()
@@ -12,7 +13,11 @@ def main():
     while True:
         # grab audio and timestamp
         audio = np.fromstring(stream.read(CHUNK_SIZE, exception_on_overflow = False), np.int16)
-        current_time = time.time()
+        newmax = np.abs(audio).max()
+        if newmax > max:
+            max = newmax
+            print(" Max = {}".format(max))
+    return
 
 if __name__ == '__main__':
     main()
