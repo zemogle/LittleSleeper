@@ -9,7 +9,7 @@ from datetime import datetime
 
 CHUNK_SIZE = 8192
 AUDIO_FORMAT = pyaudio.paInt16
-SAMPLE_RATE = 16000
+SAMPLE_RATE = 44100
 BUFFER_HOURS = 12
 AUDIO_SERVER_ADDRESS = ('localhost', 6000)
 
@@ -31,7 +31,7 @@ def process_audio(shared_audio, shared_time, shared_pos, lock):
 
     while True:
         # grab audio and timestamp
-        audio = np.fromstring(stream.read(CHUNK_SIZE), np.int16)
+        audio = np.fromstring(stream.read(CHUNK_SIZE, exception_on_overflow = False), np.int16)
         current_time = time.time()
 
         # acquire lock
