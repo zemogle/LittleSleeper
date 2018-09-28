@@ -4,9 +4,9 @@ import numpy as np
 CHUNK_SIZE = 8192
 AUDIO_FORMAT = pyaudio.paInt16
 SAMPLE_RATE = 44100
-max = 0.
 
 def main():
+    max = 0.
     p = pyaudio.PyAudio()
     stream = p.open(format=AUDIO_FORMAT, channels=1, rate=SAMPLE_RATE, input=True, frames_per_buffer=CHUNK_SIZE)
 
