@@ -1,6 +1,9 @@
 import pyaudio
 import numpy as np
 
+CHUNK_SIZE = 8192
+AUDIO_FORMAT = pyaudio.paInt16
+SAMPLE_RATE = 44100
 
 def main():
     p = pyaudio.PyAudio()
