@@ -7,7 +7,7 @@ import ctypes
 from scipy import ndimage, interpolate
 from datetime import datetime
 
-CHUNK_SIZE = 8192
+CHUNK_SIZE = 44100
 AUDIO_FORMAT = pyaudio.paInt16
 SAMPLE_RATE = 44100
 BUFFER_HOURS = 12

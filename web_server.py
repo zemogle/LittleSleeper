@@ -42,6 +42,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         print("Connection closed")
         clients.remove(self)
 
+    def check_origin(self, origin):
+        return True
+
 
 def broadcast_mic_data():
     # get the latest data from the audio server

@@ -63,7 +63,7 @@
             }
         });
 
-        var socket = new WebSocket("ws://nannycam:8090/ws");
+        var socket = new WebSocket("ws://127.0.0.1:8090/ws");
 
         socket.onmessage = function (message) {
             // update the text display
