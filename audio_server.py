@@ -102,7 +102,7 @@ def process_requests(shared_audio, shared_time, shared_pos, lock):
 
         # apply some smoothing
         sigma = 4 * (SAMPLE_RATE / float(CHUNK_SIZE))
-        audio_signal = ndimage.gaussian_filter1d(audio_signal, sigma=sigma, mode="reflect")
+        audio_signal = 10.*ndimage.gaussian_filter1d(audio_signal, sigma=sigma, mode="reflect")
 
         # get the last hour of data for the plot and re-sample to 1 value per second
         hour_chunks = int(60 * 60 * (SAMPLE_RATE / float(CHUNK_SIZE)))
