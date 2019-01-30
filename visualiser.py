@@ -9,7 +9,6 @@ def on_message(ws, message):
     r = json.loads(message)
     print(r['audio_plot'][-1])
     print('***')
-    print(message)
 
 def on_error(ws, error):
     print("** error")
