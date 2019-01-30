@@ -19,10 +19,6 @@ def on_close(ws):
 
 def on_open(ws):
     def run(*args):
-        result = ws.recv()
-        r = json.loads(result)
-        print(r['audio_plot'][-1])
-        time.sleep(1)
         ws.close()
         print("thread terminating...")
     thread.start_new_thread(run, ())
