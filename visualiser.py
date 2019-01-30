@@ -6,7 +6,8 @@ except ImportError:
 import time, json
 
 def on_message(ws, message):
-    print(message)
+    r = json.loads(message)
+    print(r['audio_plot'][-1])
 
 def on_error(ws, error):
     print(error)
@@ -16,9 +17,9 @@ def on_close(ws):
 
 def on_open(ws):
     def run(*args):
-        result = ws.recv()
-        r = json.loads(result)
-        print(r['audio_plot'][-1])
+        for i in range(3):
+            time.sleep(1)
+            ws.send("Hello %d" % i)
         time.sleep(1)
         ws.close()
         print("thread terminating...")
