@@ -12,13 +12,17 @@ def on_message(ws, message):
     print(message)
 
 def on_error(ws, error):
-    print(error)
+    print("•••error")
 
 def on_close(ws):
     print("### closed ###")
 
 def on_open(ws):
     def run(*args):
+        result = ws.recv()
+        r = json.loads(result)
+        print(r['audio_plot'][-1])
+        time.sleep(1)
         ws.close()
         print("thread terminating...")
     thread.start_new_thread(run, ())
