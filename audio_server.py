@@ -7,12 +7,24 @@ import ctypes
 from scipy import ndimage, interpolate
 from datetime import datetime
 
+EQ_CHUNK_SIZE = 256
 CHUNK_SIZE = 44100
 AUDIO_FORMAT = pyaudio.paInt16
 SAMPLE_RATE = 44100
 BUFFER_HOURS = 12
 AUDIO_SERVER_ADDRESS = ('localhost', 6000)
 
+def calculate_levels(data, chunk,sample_rate):
+    # Apply FFT - real data so rfft used
+    fourier=np.fft.rfft(data)
+    # Remove last element in array to make it the same size as chunk
+    fourier=np.delete(fourier,len(fourier)-1)
+    # Find amplitude
+    power = np.log10(np.abs(fourier))**2
+    # Arrange array into 8 rows for the 8 bars on LED matrix
+    power = np.reshape(power,(256,int(chunk/256)))
+    matrix= np.int_(np.average(power,axis=1))
+    return matrix
 
 def process_audio(shared_audio, shared_time, shared_pos, lock):
     """
@@ -87,6 +99,7 @@ def process_requests(shared_audio, shared_time, shared_pos, lock):
         # convert to numpy arrays and get a copy of the data
         time_stamps = np.frombuffer(shared_time, np.float64).copy()
         audio_signal = np.frombuffer(shared_audio, np.int16).astype(np.float32)
+        signal = audio_signal.copy()
         current_pos = shared_pos.value
 
         # release lock
@@ -104,11 +117,11 @@ def process_requests(shared_audio, shared_time, shared_pos, lock):
         sigma = 4 * (SAMPLE_RATE / float(CHUNK_SIZE))
         audio_signal = 10.*ndimage.gaussian_filter1d(audio_signal, sigma=sigma, mode="reflect")
 
-        # get the last hour of data for the plot and re-sample to 1 value per second
-        hour_chunks = int(60 * 60 * (SAMPLE_RATE / float(CHUNK_SIZE)))
+        # get the last hour of data for the plot and re-sample to 1 value per 10 seconds
+        hour_chunks = int(360 * (SAMPLE_RATE / float(CHUNK_SIZE)))
         xs = np.arange(hour_chunks)
         f = interpolate.interp1d(xs, audio_signal[-hour_chunks:])
-        audio_plot = f(np.linspace(start=0, stop=xs[-1], num=3600))
+        audio_plot = f(np.linspace(start=0, stop=xs[-1], num=360))
 
         # ignore positions with no readings
         mask = time_stamps > 0
@@ -170,11 +183,16 @@ def process_requests(shared_audio, shared_time, shared_pos, lock):
             else:
                 time_quiet = str_quiet + format_time_difference(crying_blocks[-1]['stop'], time_current)
 
+        # Spectrum analysis
+        spectrum = calculate_levels(signal, EQ_CHUNK_SIZE, SAMPLE_RATE)
+
         # return results to webserver
-        results = {'audio_plot': audio_plot,
-                   'crying_blocks': crying_blocks,
-                   'time_crying': time_crying,
-                   'time_quiet': time_quiet}
+        results = {'audio_plot'     : audio_plot,
+                   'crying_blocks'  : crying_blocks,
+                   'time_crying'    : time_crying,
+                   'time_quiet'     : time_quiet,
+                   'spectrum'       : spectrum,
+                   }
         conn.send(results)
         conn.close()
 
