@@ -7,12 +7,28 @@ import ctypes
 from scipy import ndimage, interpolate
 from datetime import datetime
 
+EQ_CHUNK_SIZE = 256
 CHUNK_SIZE = 44100
 AUDIO_FORMAT = pyaudio.paInt16
 SAMPLE_RATE = 44100
 BUFFER_HOURS = 12
 AUDIO_SERVER_ADDRESS = ('localhost', 6000)
 
+def calculate_levels(data):
+    # Convert raw data to numpy array
+    # data = unpack("%dh"%(len(data)/2),data)
+    # data = np.array(data, dtype='h')
+    # Apply FFT - real data so rfft used
+    fourier=np.fft.rfft(data)
+    # Remove last element in array to make it the same size as EQ_CHUNK_SIZE
+    fourier=np.delete(fourier,len(fourier)-1)
+    # Find amplitude
+    power = np.log10(np.abs(fourier))**2
+    # Arrange array into 8 rows for the 8 bars on LED matrix
+    print(power)
+    power = np.reshape(power,(256,int(EQ_CHUNK_SIZE/256)))
+    matrix= np.int_(np.average(power,axis=1))
+    return matrix
 
 def process_audio(shared_audio, shared_time, shared_pos, lock):
     """

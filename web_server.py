@@ -62,6 +62,7 @@ def broadcast_mic_data():
     results['date_current'] = '{dt:%A} {dt:%B} {dt.day}, {dt.year}'.format(dt=now)
     results['time_current'] = now.strftime("%I:%M:%S %p").lstrip('0')
     results['audio_plot'] = results['audio_plot'].tolist()
+    results['spectrum'] = results['spectrum'].tolist()
     for c in clients:
         c.write_message(results)
 
